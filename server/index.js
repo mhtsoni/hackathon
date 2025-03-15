@@ -7,7 +7,15 @@ import cors from 'cors';
 import axios from 'axios';
 
 
-dotenv.config({ path: '/Users/mohison/Downloads/project/.env' });
+// dotenv.config({ path: '/Users/mohison/Downloads/project/.env' });
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Validate environment variables
 console.log('Deepgram API Key:', process.env.DEEPGRAM_API_KEY);
@@ -37,9 +45,9 @@ const io = new Server(server, {
 const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
 const conversationHistories = new Map();
 
-const axios = require('axios');
-const fs = require('fs');
-const pdfParse = require('pdf-parse'); // Install via npm: npm install pdf-parse
+// const axios = require('axios');
+// const fs = require('fs');
+// const pdfParse = require('pdf-parse'); // Install via npm: npm install pdf-parse
 
 async function generateGrokResponse(history) {
   try {
@@ -51,22 +59,10 @@ async function generateGrokResponse(history) {
       .filter(entry => entry.speaker === 'customer')
       .pop()?.text || '';
 
-    // Hardcoded PDF path
-    const pdfPath = './product_info.pdf'; // Replace with your actual PDF path
-    const pdfBuffer = fs.readFileSync(pdfPath);
-    const pdfData = await pdfParse(pdfBuffer);
-    const pdfContent = pdfData.text;
-
-    // Simple RAG: Split PDF content and retrieve relevant chunk
-    const pdfSentences = pdfContent.split('.').map(s => s.trim()).filter(s => s);
-    const relevantContext = pdfSentences.find(sentence => 
-      sentence.toLowerCase().includes(latestCustomerInput.toLowerCase().split(' ')[0])) 
-      || pdfSentences[0] || '';
 
     const prompt = `You must return the response in very short sentence form and more than 2 sentences. Less than 60 words.
     You are an AI that is assisting a sales agent in making sales. 
     Provide persuasive ideas to convince the customer to buy the product/service.
-    Use this PDF context if relevant: "${relevantContext}".
     Please figure out what product or service we are selling based on the conversation.
     If the product/service isn’t deducible, offer a generic tactic.
 
